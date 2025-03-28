@@ -1,0 +1,27 @@
+name: Publish package to GitHub Packages
+on:
+  release:
+    types: [published]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@oliverlorenz'
+      - run: npm install
+      - name: Update package.json with release tag
+        run: |
+          TAG="${{ github.event.release.tag_name }}"
+          echo "Updating package.json version to $TAG"
+          npm version "$TAG" --no-git-tag-version
+      - run: npm ci
+      - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "es2016" ,
+    "module": "commonjs" ,
+    "rootDir": "./src" ,
+    "outDir": "./dist" ,
+    "esModuleInterop": true ,
+    "forceConsistentCasingInFileNames": true ,
+    "strict": true ,
+    "noImplicitAny": true ,
+    "strictNullChecks": true ,
+    "strictFunctionTypes": true ,
+    "noImplicitThis": true ,
+    "alwaysStrict": true,
+    "noImplicitReturns": true,
+    "skipLibCheck": true,
+    "pretty": true,
+    "declaration": true,
+    "declarationMap": true,
+    "plugins": [
+      {
+        "name": "typescript-strict-plugin",
+        "paths": ["src"]
+      }
+    ]
+  }
+}

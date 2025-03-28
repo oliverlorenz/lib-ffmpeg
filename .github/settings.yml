@@ -1,0 +1,25 @@
+repository:
+  private: true
+  has_issues: true
+  has_projects: false
+  has_wiki: false
+  has_downloads: true
+  default_branch: main
+  allow_squash_merge: true
+  allow_merge_commit: true
+  allow_rebase_merge: true
+  delete_branch_on_merge: true
+  enable_automated_security_fixes: true
+  enable_vulnerability_alerts: true
+
+labels:
+  - name: build
+  - name: chore
+  - name: ci
+  - name: docs
+  - name: feat
+  - name: fix
+  - name: perf
+  - name: refactor
+  - name: test
+  - name: dependencies

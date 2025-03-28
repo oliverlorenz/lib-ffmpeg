@@ -33,7 +33,7 @@
     "@eslint/js": "^9.21.0",
     "@types/fluent-ffmpeg": "^2.1.27",
     "@types/jest": "^29.5.14",
-    "@types/node": "^22.13.11",
+    "@types/node": "^22.13.14",
     "@typescript-eslint/eslint-plugin": "^8.25.0",
     "del-cli": "^6.0.0",
     "eslint": "^9.21.0",

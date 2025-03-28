@@ -10,6 +10,7 @@ import { readFile, unlink, writeFile } from 'fs/promises';
 import { Readable } from 'stream';
 import { FfmpegLoudnormMeasurementResult, VideoRenderResult } from '../types';
 import { FileSessionService } from './FileSessionService';
+import { bufferToStream } from '../helper';
 
 ffmpeg.setFfmpegPath(ffmpegInstaller.path);
 ffmpeg.setFfprobePath(ffprobeInstaller.path);
@@ -264,5 +265,21 @@ export class FfmpegService {
     } finally {
       // await unlink(tmpFilePath);
     }
+  }
+
+  public async extractFrame(videoBuffer: Buffer, offsetMs: number): Promise<Buffer> {
+    const pngFileSession = new FileSessionService('png');
+    await new Promise((resolve, reject) => {
+      ffmpeg(bufferToStream(videoBuffer))
+        .addOption('-ss ' + offsetMs / 1000)
+        .addOption('-vframes 1')
+        .on('end', resolve)
+        .on('error', reject)
+        .output(pngFileSession.filePath)
+        .run();
+    });
+    const pngBuffer = await pngFileSession.waitForRead();
+    await pngFileSession.delete();
+    return pngBuffer;
   }
 }

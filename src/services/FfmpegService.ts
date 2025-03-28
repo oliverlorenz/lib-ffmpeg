@@ -15,7 +15,6 @@ ffmpeg.setFfmpegPath(ffmpegInstaller.path);
 ffmpeg.setFfprobePath(ffprobeInstaller.path);
 
 export class FfmpegService {
-
   public merge(fileList: string[]): Promise<VideoRenderResult> {
     return new Promise((resolve, reject) => {
       const firstInput = fileList.shift();
@@ -116,7 +115,7 @@ export class FfmpegService {
     const sourceFileSession = new FileSessionService('mp4');
     const outputFileSession = new FileSessionService('mp4');
     await sourceFileSession.write(videoFileBuffer);
-    return  new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       let ffmpegInterface = ffmpeg();
       if (startMs) {
         ffmpegInterface = ffmpegInterface.addOption(`-ss ${startMs}ms`);
@@ -148,7 +147,7 @@ export class FfmpegService {
     fileExtension: string = 'mp4',
   ): Promise<number> {
     return new Promise(async (resolve, reject) => {
-      const sourceFileSession = new FileSessionService(fileExtension); 
+      const sourceFileSession = new FileSessionService(fileExtension);
       await sourceFileSession.write(buffer);
       let ffmpegInterface = ffmpeg(sourceFileSession.filePath);
       ffmpegInterface.ffprobe(async (err: any, metadata: any) => {

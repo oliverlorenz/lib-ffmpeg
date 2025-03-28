@@ -21,6 +21,7 @@ jobs:
           TAG="${{ github.event.release.tag_name }}"
           echo "Updating package.json version to $TAG"
           npm version "$TAG" --no-git-tag-version
+      - run: npm run build 
       - run: npm ci
       - run: npm publish
         env:

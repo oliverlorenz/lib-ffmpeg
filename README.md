@@ -1,11 +1,11 @@
-# <REPO_NAME>
+# lib-ffmpeg
 
 a description
 
 ## Installation
 
-To install <REPO_NAME>, use npm:
+To install lib-ffmpeg, use npm:
 
 ```bash
-npm install @oliverlorenz/<REPO_NAME>
+npm install @oliverlorenz/lib-ffmpeg
 ```

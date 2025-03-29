@@ -286,4 +286,31 @@ export class FfmpegService {
     await pngFileSession.delete();
     return pngBuffer;
   }
+
+  public async watermarkFullSize(videoBuffer: Buffer, watermarkBuffer: Buffer) {
+    const sourceVideoFileSession = new FileSessionService('mp4');
+    const targetVideoFileSession = new FileSessionService('mp4');
+    const watermarkFileSession = new FileSessionService('png');
+    await sourceVideoFileSession.write(videoBuffer);
+    await watermarkFileSession.write(watermarkBuffer);
+
+    return new Promise<Buffer>((resolve, reject) => {
+      ffmpeg(sourceVideoFileSession.filePath)
+        .addInput(watermarkFileSession.filePath)
+        .addOption('-filter_complex', 'overlay=0:0')
+        .on('end', async () => {
+          const buffer = targetVideoFileSession.waitForRead();
+          void sourceVideoFileSession.delete();
+          void watermarkFileSession.delete();
+          resolve(buffer);
+        })
+        .on('error', async (err: any) => {
+          void targetVideoFileSession.delete();
+          void sourceVideoFileSession.delete();
+          void watermarkFileSession.delete();
+          reject(err);
+        })
+        .saveToFile(targetVideoFileSession.filePath);
+    });
+  }
 }

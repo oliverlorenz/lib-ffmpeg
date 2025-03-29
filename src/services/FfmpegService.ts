@@ -287,7 +287,7 @@ export class FfmpegService {
     return pngBuffer;
   }
 
-  public async watermarkFullSize(videoBuffer: Buffer, watermarkBuffer: Buffer) {
+  public async watermarkFullSize(videoBuffer: Buffer, watermarkBuffer: Buffer): Promise<Buffer> {
     const sourceVideoFileSession = new FileSessionService('mp4');
     const targetVideoFileSession = new FileSessionService('mp4');
     const watermarkFileSession = new FileSessionService('png');

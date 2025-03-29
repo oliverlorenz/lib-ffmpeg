@@ -1,5 +1,5 @@
-import { existsSync } from 'fs';
-import { unlink, writeFile } from 'fs/promises';
+import { existsSync, statSync } from 'fs';
+import { readFile, unlink, writeFile } from 'fs/promises';
 import { v4 as uuidv4 } from 'uuid';
 
 export class FileSessionService {
@@ -21,20 +21,35 @@ export class FileSessionService {
   }
 
   public async read(): Promise<Buffer> {
-    return Buffer.from(this.filePath);
+    return readFile(this.filePath);
   }
 
   public async waitForRead(): Promise<Buffer> {
     let count = 0;
-    while (!existsSync(this.filePath)) {
-      await new Promise((resolve) => {
-        count++;
-        setTimeout(resolve, 500);
-      });
+    let size = 0;
+    let loop = true;
+
+    while (loop) {
+      const isExisting = existsSync(this.filePath);
+      const currentSize = statSync(this.filePath).size;
+      const isGrowing = currentSize > size;
+
+      if (isExisting && !isGrowing) {
+        loop = false;
+      } else if (isExisting && isGrowing) {
+        size = currentSize;
+      } else {
+        loop = false;
+      }
+      count++;
       if (count > 30) {
         throw new Error('File not found');
       }
+      await new Promise((resolve) => {
+        setTimeout(resolve, 100);
+      });
     }
+
     return this.read();
   }
 

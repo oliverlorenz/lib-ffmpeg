@@ -116,17 +116,21 @@ export class FfmpegService {
     const sourceFileSession = new FileSessionService('mp4');
     const outputFileSession = new FileSessionService('mp4');
     await sourceFileSession.write(videoFileBuffer);
+
     return new Promise((resolve, reject) => {
       let ffmpegInterface = ffmpeg();
       if (startMs) {
         ffmpegInterface = ffmpegInterface.addOption(`-ss ${startMs}ms`);
       }
+
       ffmpegInterface = ffmpegInterface
         .addOption(`-accurate_seek`)
         .addOption(`-i ${sourceFileSession.filePath}`);
+
       if (endMs) {
         ffmpegInterface = ffmpegInterface.addOption(`-to ${endMs}ms`);
       }
+
       ffmpegInterface
         .addOption(`-map 0`)
         .addOption(`-shortest`)

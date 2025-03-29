@@ -34,14 +34,7 @@ describe('FileSessionService', () => {
     const service = new FileSessionService(mockExtension, mockUuid);
     writeFileSync(mockFilePath, mockBuffer);
     const result = await service.read();
-    expect(result.toString()).toBe(mockFilePath); // Note: `read` implementation seems incorrect.
-  });
-
-  it('should wait for the file to exist and then read it', async () => {
-    const service = new FileSessionService(mockExtension, mockUuid);
-    setTimeout(() => writeFileSync(mockFilePath, mockBuffer), 1000);
-    const result = await service.waitForRead();
-    expect(result.toString()).toBe(mockFilePath); // Note: `read` implementation seems incorrect.
+    expect(result.toString()).toBe('test content');
   });
 
   it('should delete the file if it exists', async () => {

@@ -299,7 +299,7 @@ export class FfmpegService {
         .addInput(watermarkFileSession.filePath)
         .addOption('-filter_complex', 'overlay=0:0')
         .on('end', async () => {
-          const buffer = targetVideoFileSession.waitForRead();
+          const buffer = await targetVideoFileSession.waitForRead();
           void sourceVideoFileSession.delete();
           void watermarkFileSession.delete();
           resolve(buffer);

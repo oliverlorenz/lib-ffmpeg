@@ -20,12 +20,12 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/oliverlorenz/lib-ffmpeg/issues"
   },
   "homepage": "https://github.com/oliverlorenz/lib-ffmpeg#readme",
-  "description": "",
+  "description": "Utility functions for working with ffmpeg",
   "engines": {
     "node": ">=22.0.0"
   },

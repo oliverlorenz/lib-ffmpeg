@@ -3,3 +3,4 @@
 /dist
 *.tgz
 src/checks.ts
+__tests__

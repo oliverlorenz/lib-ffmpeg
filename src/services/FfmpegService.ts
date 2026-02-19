@@ -99,8 +99,12 @@ export class FfmpegService {
         // .on("start", console.log)
         .on('end', async function () {
           const buffer = await readFile(outputPath);
-          await unlink(outputPath);
-          await unlink(tmpFilePath);
+          try {
+            await unlink(outputPath);
+          } catch {}
+          try {
+            await unlink(tmpFilePath);
+          } catch {}
           resolve(buffer);
         })
         .on('error', reject)
@@ -139,8 +143,8 @@ export class FfmpegService {
           resolve(await outputFileSession.waitForRead());
           void outputFileSession.delete();
         })
-        .on('error', async function () {
-          reject();
+        .on('error', async function (err: any) {
+          reject(err || new Error('ffmpeg error'));
           void outputFileSession.delete();
         })
         .saveToFile(outputFileSession.filePath);
@@ -200,7 +204,14 @@ export class FfmpegService {
                 reject(new Error('could find parsed_loudnorm'));
                 return;
               }
-              resolve(JSON.parse(loudnorm) as FfmpegLoudnormMeasurementResult);
+              try {
+                resolve(JSON.parse(loudnorm) as FfmpegLoudnormMeasurementResult);
+              } catch (e) {
+                reject(e);
+              }
+            })
+            .on('error', (err: any) => {
+              reject(err);
             })
             .run();
           // return readFile(outputFilePath);
@@ -257,9 +268,16 @@ export class FfmpegService {
                 reject(err);
                 return;
               }
-              const outputBuffer = await readFile(outputFilePath);
-              await unlink(outputFilePath);
-              resolve(outputBuffer);
+              try {
+                const outputBuffer = await readFile(outputFilePath);
+                await unlink(outputFilePath);
+                resolve(outputBuffer);
+              } catch (e) {
+                reject(e);
+              }
+            })
+            .on('error', (err: any) => {
+              reject(err);
             })
             .run();
         } catch (err) {
@@ -312,5 +330,51 @@ export class FfmpegService {
         })
         .saveToFile(targetVideoFileSession.filePath);
     });
+  }
+
+  public async cutOutSegments(
+    videoBuffer: Buffer,
+    segments: { startMs: number; endMs: number }[],
+  ): Promise<Buffer> {
+    if (!segments.length) {
+      return videoBuffer;
+    }
+
+    const sorted = [...segments].sort((a, b) => a.startMs - b.startMs);
+    const keepSegments: { startMs: number; endMs: number }[] = [];
+    let lastEnd = 0;
+    for (const seg of sorted) {
+      if (seg.startMs > lastEnd) {
+        keepSegments.push({ startMs: lastEnd, endMs: seg.startMs });
+      }
+      lastEnd = Math.max(lastEnd, seg.endMs);
+    }
+
+    const duration = await this.getDurationFromBuffer(videoBuffer);
+    if (lastEnd < duration) {
+      keepSegments.push({ startMs: lastEnd, endMs: duration });
+    }
+
+    let cutBuffers: Buffer[];
+    try {
+      cutBuffers = await Promise.all(
+        keepSegments.map((segment) => this.cut(videoBuffer, segment.startMs, segment.endMs)),
+      );
+    } catch (err) {
+      throw err;
+    }
+
+    const fileSessions: FileSessionService[] = [];
+    try {
+      for (const buf of cutBuffers) {
+        const session = new FileSessionService('mp4');
+        await session.write(buf);
+        fileSessions.push(session);
+      }
+      const merged = await this.merge(fileSessions.map((s) => s.filePath));
+      return merged.buffer;
+    } finally {
+      await Promise.all(fileSessions.map((s) => s.delete()));
+    }
   }
 }

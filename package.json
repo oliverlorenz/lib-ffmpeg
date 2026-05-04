@@ -57,6 +57,6 @@
     "@ffprobe-installer/ffprobe": "^2.1.2",
     "canvas": "^3.2.1",
     "fluent-ffmpeg": "^2.1.3",
-    "uuid": "^11.1.0"
+    "uuid": "^14.0.0"
   }
 }
